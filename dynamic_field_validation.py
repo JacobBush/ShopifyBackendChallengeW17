@@ -1,12 +1,13 @@
 # Jacob Bush, University of Waterloo, 2017
 #
-# Made for Shopify
+# Made for:
+# Shopify
 # Developer Intern - Winternship 2018
 # Back End Development Problem
 #
 # Created and Tested in Python 3.6.0
 
-import urllib.request, json 
+import urllib.request, json, numbers
 
 # define a function to query the API
 def get_page(base_url, page_number):
@@ -23,14 +24,32 @@ def valid_customer_field (customer, field, constraints):
     # field is a possible key in customer (ex. "name", "email", etc.)
     # constraints are the constraints imposed on the field - will be
     # all of ["required", "type", "length"] as per the assignment specifications.
+    # This function does not allow substitutions such as "false" for false.
 
-
-    if ((field in customer) and (customer[field])):
+    if field in customer and not customer[field] is None:
         # field was provided
-        print("field provided")
+        # Check if there is type specified (or length)
+        if "length" in constraints or ("type" in constraints and constraints["type"] == "string"):
+            if not isinstance(customer[field], str):
+                return False
+            #is a valid string - must check length
+            if ("length" in constraints):
+                # have a specified length for the string - test within bounds
+                if ("min" in constraints["length"] and len(customer[field]) < constraints["length"]["min"]):
+                    return False
+                if ("max" in constraints["length"] and len(customer[field]) > constraints["length"]["max"]):
+                    return False
+        elif "type" in constraints and constraints["type"] == "boolean":
+            if not isinstance(customer[field], bool):
+                return False
+        elif "type" in constraints and constraints["type"] == "number":
+            if not isinstance(customer[field], numbers.Real) or isinstance(customer[field], bool):
+                # extra check since booleans are considered numbers in python
+                return False
+        
     else:
         # field was not provided - check if was required
-        if (constraints["required"]):
+        if "required" in constraints and constraints["required"]:
             # field was required and not provided - this is an invalid field
             return False
     
