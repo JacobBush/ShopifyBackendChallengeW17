@@ -99,7 +99,7 @@ while (True):
     else:
         current_page += 1 # increment page and loop if haven't looked at all the user data
 
-
-
-
-print (invalid_customers)
+# All that is left is to format the invalid_customers data into JSON
+invalid_customers_dictionary = {"invalid_customers" : invalid_customers}
+invalid_customers_json = json.dumps(invalid_customers_dictionary)
+print (invalid_customers_json)
