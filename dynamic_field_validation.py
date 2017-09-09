@@ -84,9 +84,22 @@ def get_invalid_customers (customers, validations):
 # URL to API
 endpoint_url = 'https://backend-challenge-winter-2017.herokuapp.com/customers.json'
 
-# Here we get the 1st page of user data
-# Could be looped to get all pages
-data = get_page(endpoint_url , 1)
+# We will store all invalid customers in a list
+invalid_customers = []
 
-invalid_customers = get_invalid_customers(data["customers"], data["validations"])
+# set the first page to page 1
+current_page = 1
+
+while (True):
+    # We will loop over all pages until we have gotten all of the user data
+    data = get_page(endpoint_url , current_page)    
+    invalid_customers += get_invalid_customers(data["customers"], data["validations"])
+    if (data["pagination"]["current_page"] * data["pagination"]["per_page"] >= data["pagination"]["total"]):
+        break # break if we have looked at all user data
+    else:
+        current_page += 1 # increment page and loop if haven't looked at all the user data
+
+
+
+
 print (invalid_customers)
